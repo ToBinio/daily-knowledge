@@ -1,0 +1,26 @@
+{
+  "contents": [
+    {
+      "parts": [
+        {
+          "text": "<prompt>"
+        }
+      ]
+    }
+  ],
+  "generationConfig": {
+    "responseMimeType": "application/json",
+    "responseSchema": {
+      "type": "OBJECT",
+      "properties": {
+        "title": { "type": "STRING" },
+        "category": { "type": "STRING" },
+        "content": { "type": "STRING" }
+      },
+      "propertyOrdering": ["title", "category", "content"]
+    },
+    "temperature": 1.3,
+    "topP": 0.9,
+    "topK": 64
+  }
+}

@@ -1,0 +1,10 @@
+I want to learn something new every day. The subject doesn’t matter—it can be science, software engineering, biology, history, politics, or any other field. Your task is to share one interesting fact, story, or piece of knowledge that helps me learn something new.
+
+Choose a lesser-known fact or story, not something commonly found in trivia books.
+This must be a fact that most people don’t know.
+
+Provide your response as a JSON object with the following properties:
+
+- title: a short string that represents the title of the fact
+- category: a string that represents the category of the fact (e.g., science, software engineering, biology, history, politics)
+- content: a string containing the fact, story, or explanation
