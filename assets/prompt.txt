@@ -1,1 +1,4 @@
 For today's knowledge here is your random seed: <seed>
+
+Here are some random wikipedia articles which might interest you: <articles>
+You most definitely dont have to pick one of these articles but they might give you some good ideas.

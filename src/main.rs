@@ -42,10 +42,39 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[derive(serde::Deserialize, Debug)]
-pub struct AiResponse {
+pub struct WikiResponse {
+    query: WikiRandomResponse,
+}
+
+#[derive(serde::Deserialize, Debug)]
+pub struct WikiRandomResponse {
+    pub random: Vec<WikiPageResponse>,
+}
+
+#[derive(serde::Deserialize, Debug)]
+pub struct WikiPageResponse {
     pub title: String,
-    pub category: String,
-    pub content: String,
+}
+
+async fn get_random_wikipedia_article() -> Result<Vec<String>, String> {
+    let client = reqwest::Client::new();
+    let response = client.get("https://en.wikipedia.org/w/api.php?action=query&format=json&list=random&rnnamespace=0&rnlimit=25")
+        .header("User-Agent", "daily-knowledge - https://github.com/ToBinio/daily-knowledge")
+        .send().await
+        .map_err(|e| format!("Failed to send request: {}", e))?
+        .text()
+        .await
+        .map_err(|e| format!("Failed to read response: {}", e))?;
+
+    let response: WikiResponse =
+        serde_json::from_str(&response).map_err(|e| format!("Failed to parse JSON: {}", e))?;
+
+    Ok(response
+        .query
+        .random
+        .into_iter()
+        .map(|page| page.title)
+        .collect())
 }
 
 fn get_random_seed() -> String {
@@ -60,8 +89,18 @@ fn get_random_seed() -> String {
     return random_string;
 }
 
+#[derive(serde::Deserialize, Debug)]
+pub struct AiResponse {
+    pub title: String,
+    pub category: String,
+    pub content: String,
+}
+
 async fn get_ai_response(settings: &Settings) -> Result<AiResponse, String> {
-    let prompt = PROMPT.replace("<seed>", &get_random_seed());
+    let prompt = PROMPT.replace("<seed>", &get_random_seed()).replace(
+        "<articles>",
+        &get_random_wikipedia_article().await?.join(", "),
+    );
     let request = REQUEST
         .replace("<system_instruction>", SYSTEM_INSTRUCTION)
         .replace("<prompt>", &prompt);
