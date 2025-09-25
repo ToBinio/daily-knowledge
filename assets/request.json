@@ -1,4 +1,11 @@
 {
+  "system_instruction": {
+    "parts": [
+      {
+        "text": "<system_instruction>"
+      }
+    ]
+  },
   "contents": [
     {
       "parts": [

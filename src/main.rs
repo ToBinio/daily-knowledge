@@ -1,6 +1,8 @@
+use rand::{Rng, distr::Alphanumeric};
 use tokio_cron_scheduler::{Job, JobScheduler};
 
 const PROMPT: &str = include_str!("../assets/prompt.txt");
+const SYSTEM_INSTRUCTION: &str = include_str!("../assets/system_instruction.txt");
 const REQUEST: &str = include_str!("../assets/request.json");
 
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -46,7 +48,26 @@ pub struct AiResponse {
     pub content: String,
 }
 
+fn get_random_seed() -> String {
+    let len = 64;
+
+    let random_string: String = rand::rng()
+        .sample_iter(&Alphanumeric)
+        .take(len)
+        .map(char::from)
+        .collect();
+
+    return random_string;
+}
+
 async fn get_ai_response(settings: &Settings) -> Result<AiResponse, String> {
+    let prompt = PROMPT.replace("<seed>", &get_random_seed());
+    let request = REQUEST
+        .replace("<system_instruction>", SYSTEM_INSTRUCTION)
+        .replace("<prompt>", &prompt);
+
+    println!("{}", request);
+
     let response = reqwest::Client::new()
         .post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent")
         .header(
@@ -58,7 +79,7 @@ async fn get_ai_response(settings: &Settings) -> Result<AiResponse, String> {
             settings.gemini_key.clone(),
         )
         .body(
-            REQUEST.replace("<prompt>", PROMPT),
+            request
         )
         .send()
         .await
